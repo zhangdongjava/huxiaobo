@@ -1,0 +1,404 @@
+package com.findu.service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Random;
+
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.findu.dao.TPartnerDao;
+import com.findu.dao.TUserDao;
+import com.findu.dao.TWealthDao;
+import com.findu.dto.FUResult;
+import com.findu.dto.FUSearchPage;
+import com.findu.dto.FUUser;
+import com.findu.model.TPartner;
+import com.findu.model.TUser;
+import com.findu.model.TWealth;
+import com.findu.utils.DataUtils;
+import com.findu.utils.DateUtils;
+import com.findu.utils.ErrorCodeUtil;
+import com.findu.utils.SysParamUtils;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+
+@Service
+public class UserService {
+	private static Logger logger = Logger.getLogger(UserService.class);
+	
+	@Autowired
+	private TUserDao userDao;
+	
+	@Autowired
+	private TPartnerDao partnerDao;
+	
+	@Autowired
+	private TWealthDao wealthDao;
+	public TUser getTUser(long id){
+		TUser user = new TUser();
+		user.setUserId(id);
+		user = userDao.get(user, id);
+		if(user == null){
+			logger.warn(String.format("user %d is invalid", id));
+			return null;
+		}
+		return user;
+	}
+	/**
+	 * 查询用户
+	 * @param u
+	 * @param and
+	 * @return
+	 */
+	public TUser findTUser(TUser u,boolean and){
+		return userDao.find(u, true);
+	}
+	public FUUser getUser(long id){
+		TUser user = new TUser();
+		user.setUserId(id);
+		user = userDao.get(user, id);
+		if(user == null){
+			logger.warn(String.format("user %d is invalid", id));
+			return null;
+		}
+		FUUser uo = new FUUser();
+		DataUtils.CopyBean(user, uo);
+		TPartner partner = new TPartner();
+		partner.setUserId(id);
+		partner.setType(TPartner.TYPE_DEFAULT);
+		partner = partnerDao.find(partner, true);
+		if(partner == null){
+			logger.warn(String.format("user %d has no default partner", id));
+			return null;
+		}
+		uo.setPid(partner.getFuId());
+		uo.setPartnerId(partner.getPartnerId());
+		
+		
+		return uo;
+	}
+
+	public int updateUser(TUser user) {
+		if(!userDao.update(user)){
+			logger.warn("update user error");
+			return ErrorCodeUtil.ERROR_NOT_EXIST;
+		}
+		return ErrorCodeUtil.ERROR_SUCCESS;
+	}
+
+	public int deleteUser(long id) {
+		TUser user = new TUser();
+		user.setUserId(id);
+		if(!userDao.delete(user)){
+			logger.warn("delete user error");
+			return ErrorCodeUtil.ERROR_NOT_EXIST;
+		}
+		return ErrorCodeUtil.ERROR_SUCCESS;
+	}
+
+	public int insertUser(TUser user) {
+		if(user.getCreateTime() == null)
+			user.setCreateTime(new Date());
+		if(userDao.insert(user) == null)
+			return ErrorCodeUtil.ERROR_SYSTEM;
+		return ErrorCodeUtil.ERROR_SUCCESS;
+	}
+	
+	public int resetUserPassword(TUser user){
+		TUser entity = new TUser();
+		entity.setAccount(user.getAccount());
+		entity.setPhone(user.getPhone());
+		entity = userDao.find(entity, true);
+		if(entity == null){
+			logger.warn(String.format("user [%s, %s] does not exist", user.getAccount(), user.getPhone()));
+			return ErrorCodeUtil.ERROR_NOT_EXIST;
+		}
+		try {
+			if (user.getPassword() != null)
+				entity.setPassword(user.getPassword());
+			if (user.getPayPassword() != null)
+				entity.setPayPassword(user.getPayPassword());
+			if(!DataUtils.CopyBean(entity, user)){
+				logger.warn("copy user bean error");
+				return ErrorCodeUtil.ERROR_REQUEST_PARAMETER;
+			}
+			if(!userDao.update(entity)){
+				logger.warn("update user error");
+				return ErrorCodeUtil.ERROR_NOT_EXIST;
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			logger.error(e.getMessage());
+			return ErrorCodeUtil.ERROR_SYSTEM;
+		}
+		return ErrorCodeUtil.ERROR_SUCCESS;
+	}
+
+	/**
+	 * 用户登录，并返回用户信息
+	 * @param user，用户实体对象。
+	 * @param uo，用户传输对象。
+	 * @return
+	 */
+	public int loginUser(TUser user, FUUser uo) {
+		
+		String password = user.getPassword();
+		user.setPassword(null);
+		
+		TUser u = userDao.find(user, true);
+		
+		if(u == null){
+			logger.warn(String.format("user %s,%s is not exist", user.getAccount(), user.getPhone()));
+			return ErrorCodeUtil.ERROR_ACCOUNT;
+		}
+		if(u.getPassword().equals("123456")){
+			logger.warn("user password is invalid");
+			return ErrorCodeUtil.ERROR_PASSWORD_FIX;
+		}
+		if(!u.getPassword().equals(password)){
+			logger.warn("user password is invalid");
+			return ErrorCodeUtil.ERROR_PASSWORD;
+		}
+		try {
+			u.setLastLoginTime(new Date());
+			if(!userDao.update(u)){
+				logger.warn("update user last login time error");
+				return ErrorCodeUtil.ERROR_SYSTEM;
+			}
+			
+			if(!DataUtils.CopyBean(u, user)){
+				logger.warn("copy user bean error");
+				return ErrorCodeUtil.ERROR_SYSTEM;
+			}
+			if(!DataUtils.CopyBean(u, uo)){
+				logger.warn("copy user bean error");
+				return ErrorCodeUtil.ERROR_SYSTEM;
+			}
+			TPartner partner = new TPartner();
+			partner.setUserId(user.getUserId());
+			partner.setType(TPartner.TYPE_DEFAULT);
+			partner = partnerDao.find(partner, true);
+			if(partner == null){
+				logger.warn(String.format("user %d has no default partner", user.getUserId()));
+				return ErrorCodeUtil.ERROR_ACCOUNT;
+			}
+			uo.setPid(partner.getFuId());
+			uo.setPartnerId(partner.getPartnerId());
+			
+			
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			logger.error(e.getMessage());
+			return ErrorCodeUtil.ERROR_SYSTEM;
+		}
+		return ErrorCodeUtil.ERROR_SUCCESS;
+	}
+	
+	public TPartner getPartner(long fuId, long userId){
+		TPartner partner = new TPartner();
+		partner.setFuId(fuId);
+		partner.setUserId(userId);
+		return partnerDao.get(partner, fuId);
+	}
+	public TPartner getPartner(long userId, int type){
+		TPartner partner = new TPartner();
+		partner.setType(type);
+		partner.setUserId(userId);
+		return partnerDao.find(partner, true);
+	}
+
+	public int updatePartner(TPartner partner) {
+		if(!partnerDao.update(partner)){
+			logger.warn("update partner error");
+			return ErrorCodeUtil.ERROR_NOT_EXIST;
+		}
+		return ErrorCodeUtil.ERROR_SUCCESS;
+	}
+
+	public int deletePartner(long fuId, long userId) {
+		TPartner partner = new TPartner();
+		partner.setFuId(fuId);
+		partner.setUserId(userId);
+		if(!partnerDao.delete(partner)){
+			logger.warn("delete partner error");
+			return ErrorCodeUtil.ERROR_NOT_EXIST;
+		}
+		return ErrorCodeUtil.ERROR_SUCCESS;
+	}
+
+	public int insertPartner(TPartner partner) {
+		if(partner.getPartnerId() == null){
+			String id = calPartnerId(partner.getType());
+			partner.setPartnerId(id);
+		}
+		if(partner.getCreateTime() == null)
+			partner.setCreateTime(new Date());
+		if(partnerDao.insert(partner) == null)
+			return ErrorCodeUtil.ERROR_SYSTEM;
+		return ErrorCodeUtil.ERROR_SUCCESS;
+	}
+	
+	public ArrayList<TPartner> listPartner(long userId){
+		TPartner partner = new TPartner();
+		partner.setUserId(userId);
+		return partnerDao.search(partner, true, null, false, null);
+	}
+	
+	public int registerUser(TUser user, FUUser uo) {
+		
+		Date now = new Date();
+		if(user.getPassword() == null || user.getPassword().trim().length() <= 0){
+			logger.warn(String.format("register user %s,%s need password", user.getAccount(), user.getPhone()));
+			return ErrorCodeUtil.ERROR_REQUEST_PARAMETER;
+		}
+		if(user.getPayPassword() == null || user.getPayPassword().trim().length() <= 0)
+			user.setPayPassword(user.getPassword());
+		if(user.getCreateTime() == null)
+			user.setCreateTime(now);
+		String id = calPartnerId(TPartner.TYPE_DEFAULT);
+		Session session = userDao.getSession(user);
+		Transaction tran = session.beginTransaction();
+		try {
+			if(userDao.insert(session, user) == null){
+				logger.warn(String.format("insert user %s, %s error", user.getAccount(), user.getPhone()));
+				tran.rollback();
+				return ErrorCodeUtil.ERROR_USER_DUPLICATE;
+			}
+			
+			TPartner partner = new TPartner();
+			partner.setUserId(user.getUserId());			
+			partner.setPartnerId(id);
+			partner.setPartnerPass(user.getPassword());
+			partner.setType(TPartner.TYPE_DEFAULT);
+			partner.setCreateTime(now);
+			if(partnerDao.insert(session, partner) == null){
+				logger.warn("insert default partner for user error");
+				tran.rollback();
+				return ErrorCodeUtil.ERROR_SYSTEM;
+			}
+			
+			TWealth wealth = new TWealth();
+			wealth.setUserId(user.getUserId());
+			wealth.setType(TWealth.TYPE_MONEY);
+			wealth.setCreateTime(now);
+			if(wealthDao.insert(session, wealth) == null){
+				logger.warn("insert money wealth for user error");
+				tran.rollback();
+				return ErrorCodeUtil.ERROR_SYSTEM;
+			}
+			
+			wealth = new TWealth();
+			wealth.setUserId(user.getUserId());
+			wealth.setType(TWealth.TYPE_CVM);
+			wealth.setCreateTime(now);
+			if(wealthDao.insert(session, wealth) == null){
+				logger.warn("insert currency virtual money wealth for user error");
+				tran.rollback();
+				return ErrorCodeUtil.ERROR_SYSTEM;
+			}
+			
+			wealth = new TWealth();
+			wealth.setUserId(user.getUserId());
+			wealth.setType(TWealth.TYPE_PVM);
+			wealth.setCreateTime(now);
+			if(wealthDao.insert(session, wealth) == null){
+				logger.warn("insert present virtual money wealth for error");
+				tran.rollback();
+				return ErrorCodeUtil.ERROR_SYSTEM;
+			}
+			
+			wealth = new TWealth();
+			wealth.setUserId(user.getUserId());
+			wealth.setType(TWealth.TYPE_POINT);
+			wealth.setCreateTime(now);
+			if(wealthDao.insert(session, wealth) == null){
+				logger.warn("insert point wealth for user error");
+				tran.rollback();
+				return ErrorCodeUtil.ERROR_SYSTEM;
+			}
+			
+			if(!DataUtils.CopyBean(user, uo)){
+				logger.warn("copy user bean error");
+				tran.rollback();
+				return ErrorCodeUtil.ERROR_SYSTEM;
+			}
+			
+			tran.commit();
+			
+			uo.setPid(partner.getFuId());
+			uo.setPartnerId(partner.getPartnerId());
+		} catch (Exception e) {
+			// TODO: handle exception
+			tran.rollback();
+			logger.error(e.getMessage());
+			if (e.getCause() instanceof MySQLIntegrityConstraintViolationException)
+				return ErrorCodeUtil.ERROR_USER_DUPLICATE;
+			else
+				return ErrorCodeUtil.ERROR_SYSTEM;
+		}
+		return ErrorCodeUtil.ERROR_SUCCESS;
+	}
+	
+	public int listUser(FUSearchPage page, FUResult result){
+		TUser cond = new TUser();
+		ArrayList<String> orderFields = new ArrayList<String>(){{add("lastLoginTime");}};
+		if(page.getPageCount() <= 0){
+			int count = userDao.searchCount(cond, true, orderFields, true);
+			if(count <= 0){
+				logger.info("no user find");
+				return ErrorCodeUtil.ERROR_SUCCESS;
+			}
+			result.setPageCount((count - 1) / page.getPageSize() + 1);
+			page.setPageCount(result.getPageCount());
+		}
+		
+		if(page.getPageCount() <= page.getPageNumber()){
+			logger.warn("page number is error");
+			return ErrorCodeUtil.ERROR_REQUEST_PARAMETER;
+		}
+		
+		ArrayList<TUser> users = userDao.search(cond, true, orderFields, true, page);
+		if(users == null || users.size() <= 0){
+			logger.warn("search user list error");
+			return ErrorCodeUtil.ERROR_NOT_EXIST;
+		}
+		ArrayList<FUUser> list = new ArrayList<>();
+		for(TUser user : users){
+			FUUser uo = new FUUser();
+			if(!DataUtils.CopyBean(user, uo)){
+				logger.warn("copy TUser to FUUser error");
+				return ErrorCodeUtil.ERROR_SYSTEM;
+			}
+			
+			TPartner partner = new TPartner();
+			partner.setUserId(user.getUserId());
+			partner.setType(TPartner.TYPE_DEFAULT);
+			partner = partnerDao.find(partner, true);
+			if(partner == null){
+				logger.warn(String.format("user %d has no default partner", user.getUserId()));
+				continue;
+			}
+			uo.setPid(partner.getFuId());
+			uo.setPartnerId(partner.getPartnerId());
+			list.add(uo);
+		}
+		result.setData(list);
+		return ErrorCodeUtil.ERROR_SUCCESS;
+	}
+	
+	private String calPartnerId(int type){
+		int rand = new Random().nextInt();
+		if(rand < 0)
+			rand *= -1;
+		rand %= 4;
+		String id = String.format("%d-%s-%d", type, DateUtils.formatDate("yyyyMMddhhss", new Date()), rand);
+		id = DataUtils.encrypt(id, SysParamUtils.DES_KEY_WORD);
+		id = DataUtils.MD5(id);
+		System.out.println(id.length());
+		return id;
+	}
+}

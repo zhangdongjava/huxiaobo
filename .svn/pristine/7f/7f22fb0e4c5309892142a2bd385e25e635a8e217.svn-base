@@ -1,0 +1,225 @@
+package com.findu.model;
+// Generated 2016-3-12 23:27:55 by Hibernate Tools 3.4.0.CR1
+
+import java.util.Date;
+
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.TableGenerator;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+/**
+ * 家庭关系表。
+ * 分表关键字是genealogyId
+ */
+@Entity
+@Cacheable
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE) 
+@Table(name = "t_family", uniqueConstraints = @UniqueConstraint(columnNames = { "fatherId",
+		"fatherType", "motherId", "motherType", "childId" }))
+public class TFamily implements java.io.Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8837502306973496589L;
+	private long familyId = 0;
+	/**家谱id*/
+	private long genealogyId = 0;
+	/**家谱创建者id*/
+	private long genealogyCreatorId = 0;
+	/**父亲id*/
+	private Long fatherId = null;
+	private Long fatherCreatorId = null;
+	/**父亲类型，1亲生，2继父，3养父*/
+	private Integer fatherType = null;
+	/**母亲id*/
+	private Long motherId = null;
+	private Long motherCreatorId = null;
+	/**母亲类型，1亲生，2继母，3养母*/
+	private Integer motherType = null;
+	/**家主*/
+	private Long householder = null;
+	/**孩子id*/
+	private Long childId = null;
+	private Long childCreatorId = null;
+	private Date createTime = null;
+	private int generation = 0;
+
+	public TFamily() {
+	}
+
+	public TFamily(long id, long genealogyId, long genealogyCreatorId, Date createTime) {
+		this.familyId = id;
+		this.genealogyId = genealogyId;
+		this.genealogyCreatorId = genealogyCreatorId;
+		this.createTime = createTime;
+	}
+
+	public TFamily(long id, long genealogyId, long genealogyCreatorId, Long fatherId, Long fatherCreatorId, Integer fatherType, Long motherId,
+			Long motherCreatorId, Integer motherType, Long householder, Long childId, Long childCreatorId, Date createTime) {
+		this.familyId = id;
+		this.genealogyId = genealogyId;
+		this.genealogyCreatorId = genealogyCreatorId;
+		this.fatherId = fatherId;
+		this.fatherCreatorId = fatherCreatorId;
+		this.fatherType = fatherType;
+		this.motherId = motherId;
+		this.motherCreatorId = motherCreatorId;
+		this.motherType = motherType;
+		this.householder = householder;
+		this.childId = childId;
+		this.childCreatorId = childCreatorId;
+		this.createTime = createTime;
+	}
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.TABLE, generator="customer_gen")
+	@TableGenerator(name = "customer_gen",
+				    table="t_seqno",
+				    pkColumnName="tablename",
+				    valueColumnName="seqno",
+				    pkColumnValue="t_family",
+				    allocationSize=1)
+	@Column(name = "id", unique = true, nullable = false)
+	public long getFamilyId() {
+		return familyId;
+	}
+
+	public void setFamilyId(long familyId) {
+		this.familyId = familyId;
+	}
+
+	@Column(name = "genealogyId", nullable = false)
+	public long getGenealogyId() {
+		return this.genealogyId;
+	}
+
+	public void setGenealogyId(long genealogyId) {
+		this.genealogyId = genealogyId;
+	}
+	
+	@Column(name = "genealogyCreatorId", nullable = false)
+	public long getGenealogyCreatorId() {
+		return genealogyCreatorId;
+	}
+
+	public void setGenealogyCreatorId(long genealogyCreatorId) {
+		this.genealogyCreatorId = genealogyCreatorId;
+	}
+
+	@Column(name = "fatherId")
+	public Long getFatherId() {
+		return this.fatherId;
+	}
+
+	public void setFatherId(Long fatherId) {
+		this.fatherId = fatherId;
+	}
+
+	@Column(name = "householder",nullable = false)
+	public Long getHouseholder() {
+		return householder;
+	}
+
+	public void setHouseholder(Long householder) {
+		this.householder = householder;
+	}
+
+	@Column(name = "fatherCreatorId")
+	public Long getFatherCreatorId() {
+		return this.fatherCreatorId;
+	}
+
+	public void setFatherCreatorId(Long fatherCreatorId) {
+		this.fatherCreatorId = fatherCreatorId;
+	}
+
+	@Column(name = "fatherType")
+	public Integer getFatherType() {
+		return this.fatherType;
+	}
+
+	public void setFatherType(Integer fatherType) {
+		this.fatherType = fatherType;
+	}
+
+	@Column(name = "motherId")
+	public Long getMotherId() {
+		return this.motherId;
+	}
+
+	public void setMotherId(Long motherId) {
+		this.motherId = motherId;
+	}
+
+	@Column(name = "motherCreatorId")
+	public Long getMotherCreatorId() {
+		return this.motherCreatorId;
+	}
+
+	public void setMotherCreatorId(Long motherCreatorId) {
+		this.motherCreatorId = motherCreatorId;
+	}
+
+	@Column(name = "motherType")
+	public Integer getMotherType() {
+		return this.motherType;
+	}
+
+	public void setMotherType(Integer motherType) {
+		this.motherType = motherType;
+	}
+
+	@Column(name = "childId")
+	public Long getChildId() {
+		return this.childId;
+	}
+
+	public void setChildId(Long childId) {
+		this.childId = childId;
+	}
+
+	@Column(name = "childCreatorId")
+	public Long getChildCreatorId() {
+		return this.childCreatorId;
+	}
+
+	public void setChildCreatorId(Long childCreatorId) {
+		this.childCreatorId = childCreatorId;
+	}
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "createTime", nullable = false, length = 19,updatable=false)
+	public Date getCreateTime() {
+		return this.createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	@Transient
+	@JsonIgnore
+	public int getGeneration() {
+		return generation;
+	}
+
+	public void setGeneration(int generation) {
+		this.generation = generation;
+	}
+
+}

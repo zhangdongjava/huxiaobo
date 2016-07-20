@@ -1,0 +1,57 @@
+package com.findu.dto;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.findu.model.TMember;
+
+/**
+ * 家庭成员
+
+* @ClassName: FUFamily 
+
+* @Description: TODO(这个类的作用是：显示家庭成员信息) 
+
+* @author Hu Xiaobo
+
+* @date 2016年7月11日 下午3:11:34 
+
+*
+ */
+public class FUFamilyMember {
+	private TMember father;
+	private TMember mother;
+	private TMember husband;
+	private TMember wife;
+	private List<TMember> children = new ArrayList<TMember>();
+	public TMember getFather() {
+		return father;
+	}
+	public void setFather(TMember father) {
+		this.father = father;
+	}
+	public TMember getMother() {
+		return mother;
+	}
+	public void setMother(TMember mother) {
+		this.mother = mother;
+	}
+	public TMember getHusband() {
+		return husband;
+	}
+	public void setHusband(TMember husband) {
+		this.husband = husband;
+	}
+	public TMember getWife() {
+		return wife;
+	}
+	public void setWife(TMember wife) {
+		this.wife = wife;
+	}
+	public List<TMember> getChildren() {
+		return children;
+	}
+	public void setChildren(List<TMember> children) {
+		this.children = children;
+	}
+}

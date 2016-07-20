@@ -1,0 +1,91 @@
+package com.findu.controller;
+
+import java.io.PrintWriter;
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.findu.service.AuthService;
+import com.findu.utils.DataUtils;
+import com.findu.utils.DateUtils;
+import com.findu.utils.ErrorCodeUtil;
+import com.findu.utils.SysParamUtils;
+
+/**
+ * 接口消息鉴权。<br/>
+ * 一次鉴权需要头字段 Timestamp(yyyy-MM-dd HH:mm:ss (Z)) 和 Auth。<br/>
+ * 二次鉴权还需要头字段 once 和 code。<br/>
+ */
+public class AuthInterceptor implements HandlerInterceptor {
+	
+	public static final String BASE_PATH = "/findu/v2_1";
+//	private static final Logger logger = LoggerFactory.getLogger(AuthInterceptor.class);
+	private static Logger logger = Logger.getLogger(AuthInterceptor.class);
+
+	@Autowired
+	private AuthService authService;
+	
+	@Override
+	public boolean preHandle(HttpServletRequest req, HttpServletResponse res,
+			Object arg2) throws Exception {
+		logger.info(String.format("receive %s request for URL %s from client %s", req.getMethod(), req.getRequestURI(), req.getRemoteAddr()));
+		String timestamp = req.getHeader("Timestamp");
+		String Auth = req.getHeader("Auth");
+		boolean flag = authService.verifyToken(timestamp, Auth);
+		if(!flag){
+			logger.warn(String.format("请求验证失败；Timestamp %s, Auth : %s", timestamp, Auth));
+			return false;
+		}
+		
+		//检查用户的请求，检查是否是支付请求		
+		if(req.getServletPath().toLowerCase().indexOf(BASE_PATH + "/wealth") >= 0 
+				|| req.getServletPath().toLowerCase().indexOf(BASE_PATH + "/bill") >= 0
+				|| req.getServletPath().toLowerCase().indexOf(BASE_PATH + "/payment") >= 0){
+			String userId = req.getParameter("userId");
+			String once = req.getHeader("once");
+			String code = req.getHeader("code");
+			if(once==null || once.length()<=0
+					|| code == null || code.length()<=0
+					|| userId==null || userId.length()<=0){
+				res.setContentType("application/json;charset=utf-8");
+				PrintWriter pw = res.getWriter();
+				//定义返回json
+				once = DataUtils.encrypt(DateUtils.formatDate("MMyyyyddHHsss", new Date()), SysParamUtils.DES_KEY_WORD);
+				String result = String.format("{\"code\":401,\"reason\":\"%s\",\"once\":\"%s\"}"
+						, ErrorCodeUtil.getErrorCodeReason(401), once);
+				pw.println(result);
+				logger.warn(String.format("bill first auth, generate once %s 账单第一次请求", once));
+				return false;
+			}
+			
+			if(!authService.verifyCode(userId, once, code, timestamp)){
+				logger.warn("bill second auth error (账单第二次请求失败！)");
+				return false;
+			}
+			logger.info("账单第二次请求 验证成功！");
+		}
+		return true;
+	}
+	
+	@Override
+	public void afterCompletion(HttpServletRequest arg0,
+			HttpServletResponse arg1, Object arg2, Exception arg3)
+			throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void postHandle(HttpServletRequest arg0, HttpServletResponse arg1,
+			Object arg2, ModelAndView arg3) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+}

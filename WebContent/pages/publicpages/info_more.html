@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8" />
+		<title>家族资讯</title>
+		<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="../css/style.css" />
+		<style type="text/css">
+		    .info_detail {
+		    	/*width: 95%;*/
+		    	/*margin-right: auto;*/
+		    	/*margin-left: auto;*/
+		    }
+		    .info_detail .info_title {
+		    	font-size: 1.6em;
+		    	font-weight: bold;
+		    	margin: 10px 0;
+		    	font-weight: bold;
+		    }
+		    .info_detail .info_time {
+		    	font-size: 1.3em;
+		    }
+		    .info_detail .info_content textarea{
+		    	/*width: 100%;*/
+		    	background-color: #fafafa;
+		    	border: 0;
+		    	font-size: 1.4em;
+		    	line-height: 2em;
+		    	resize: none;
+		    }
+		    .follow {
+		    	color: #d3ab6d;
+		    	padding-left: 10px;
+		    }
+		    .attention {
+		    	background-color: #d3ab6d;
+		    	color: white;
+		    	text-align: center;
+		    	padding: 5px 0;
+		    	margin: 15px 0;
+		    }
+		    .info_sharing {
+		    	position: absolute;
+		    	bottom: 0px;
+		    	background-color: white;
+		    	width: 100%;
+		    	max-width: 780px;
+		    	font-size: 1.6em;
+		    }
+		    .info_sharing>div {
+		    	padding: 10px;
+                text-align: center;
+                border-top: 1px solid #dadada;
+		    }
+		</style>
+	</head>
+	<body>
+	<div>
+	    <header>
+		    <a class="back">
+		    	<span class="glyphicon glyphicon-menu-left" style="top: 2px;"></span>返回
+		    </a>
+		    <span class="title">家资讯</span>
+	        <span class="glyphicon glyphicon-option-horizontal" style="float: right;padding-right: 4px;top: 2px;font-size: 2em;"></span>
+	    </header>
+	    <div class="info_detail container-fluid">
+		    <div class="info_title row">族谱的创新与开发</div>
+		    <div class="row">
+		    	<span class="info_time col-xs-3">2016-01-15</span>
+		    	<span class="follow col-xs-2">找你科技</span>
+		    </div>
+		    <div class="attention row">
+		    	<div style="font-size: 1.2em;">点击上方“找你科技”，关注找你科技微信公众号</div>
+		    	<div style="font-size: 2em;">找你（FindU）家族文创第一品牌</div>
+		    </div>
+		    <div class="info_content row">
+		    	<textarea disabled="disabled" class="col-xs-12">      中国之史志，谱牒，世界文化之瑰宝也。自周逮清，迄与民国，时间不足三千年，方志之之富已。。子孙世系传承之书，具有区分家族成员血缘关系亲疏远近的作用，是中国封建宗法制度的产物。随着历史的发展，家谱由官修变为私修，所录内容不断丰富，其作用也不断增加和变化。如今，家谱同各姓氏的郡望、堂号一样，不仅为区别姓氏源流，可作为数典认祖、研究历史、地理、社会、民俗等参考资料.
+
+    1，族谱的社会价值 
+     它还是姓氏文化的重要组成部分。家谱是中国特有的文化遗产，在汉族有悠久的历史，后来在民族融合中。逐渐在各民族中开始出现家谱。家谱是中华民族的三大文献（国史，地志，家谱）之一，属珍贵的人文资料，对于历史学、民俗学、人口学、社会学和经济学的深入研究，均有其不可替代的独特功能</textarea>
+		    </div>
+	    </div>
+	
+	    <div class="info_sharing">
+	    	<div>发送给亲友</div>
+	    	<div>QQ,微信分享</div>
+	    	<div>微博分享</div>
+	    	<div style="border-top: 4px solid #dadada;">取消</div>
+	    </div>
+	</div>
+	<script type="text/javascript" src="../js/jquery-2.0.3.min.js" ></script>
+	<script type="text/javascript">
+		$("textarea").height($("textarea")[0].scrollHeight+20);
+	</script>
+	</body>
+</html>
+ 

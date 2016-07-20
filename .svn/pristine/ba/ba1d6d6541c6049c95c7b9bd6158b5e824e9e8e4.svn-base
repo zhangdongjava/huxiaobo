@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8" />
+		<title>分享到微信，QQ</title>
+		<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="../css/style.css" />
+		<style type="text/css">
+		    .info_share {
+		    	background-color: white;
+		    	padding: 5%;
+		    	border-bottom: 1px solid #dadada;
+		    }
+		    .info_share .info_main {
+		    	/*width: 66%;
+		    	float: right;*/
+		    	padding-left: 1em;
+		    }
+		    .info_share .info_title {
+		    	font-size: 1.5em;
+		    	padding: 1em 0;
+		    	font-weight: bold;
+		    }
+		    .info_share .info_img {
+		    	/*width: 33%;*/
+		    	padding: 16.5%;
+		    	display: inline-block;
+		    	background-image: url(../img/test1.jpg);
+		    	background-position: center;
+		    	background-size: cover;
+		    	background-repeat: no-repeat;
+		    }
+		    .info_share .info_profiles {
+		    	font-size: 1.3em;
+		    	color: #7c7c7c;
+		    	max-height: 72px;
+		    	overflow: hidden;
+		    }
+		    .share_mode {
+		    	/*width: 90%;*/
+		    	background-color: white;
+		    	padding: 1em;
+		    	/*margin: 1.2em auto;*/
+		    	margin-top: 1.2em;
+		    	border: 1px solid #dadada;
+		    	text-align: center;
+		    	font-size: 1.4em;
+		    }
+		</style>
+	</head>
+	<body>
+	<div>
+	    <header>
+		    <a class="back">
+		    	<span class="glyphicon glyphicon-menu-left" style="top: 2px;"></span>返回
+		    </a>
+		        <span class="title">分享到微信，QQ</span>
+	    </header>
+	    <div class="container-fluid">
+		    <div class="info_share row">
+		    	<div class="info_img col-xs-4">
+		    	</div>
+		    	<div class="info_main col-xs-8">
+		    		<div class="info_title">中国家谱之春秋战国时代</div>
+		    		<div class="info_profiles">中国之史志，谱牒，世界文化之瑰宝也中国之史志，谱牒，世界文化之瑰宝也中国之史志，谱牒，世界文化之瑰宝也中国之史志，谱牒，世界文化之瑰宝也</div>
+		    	</div>
+		    </div>
+		    <div class="share_mode col-xs-10 col-xs-offset-1">
+		    	分享给QQ好友
+		    </div>
+		    <div class="share_mode col-xs-10 col-xs-offset-1">
+		    	分享到QQ空间
+		    </div>
+	    </div>
+	
+	</div>
+	<script type="text/javascript">
+		
+	</script>
+	</body>
+</html>
+ 

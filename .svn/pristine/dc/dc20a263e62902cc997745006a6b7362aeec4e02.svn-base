@@ -1,0 +1,243 @@
+{
+    "id": 1,
+    "creatorId": 1,
+    "centerId": 1,
+    "tiers": [
+        [
+            12
+        ],
+        [
+            2,
+            3,
+            6,
+            10,
+            7,
+            8,
+            11,
+            9
+        ],
+        [
+            1,
+            5
+        ],
+        [
+            4
+        ]
+    ],
+    "members": {
+        "1": {
+            "id": 1,
+            "userId": 1,
+            "surname": "林",
+            "name": "朗",
+            "sexy": 1,
+            "tier": 0,
+            "asFather": [
+                {
+                    "childIds": [
+                        4
+                    ],
+                    "wifeId": 5,
+                    "householder": false
+                }
+            ],
+            "asSon": [
+                {
+                    "fatherId": 2,
+                    "motherId": 3
+                }
+            ]
+        },
+        "2": {
+            "id": 2,
+            "surname": "林",
+            "name": "父",
+            "sexy": 1,
+            "tier": -1,
+            "asFather": [
+                {
+                    "childIds": [
+                        1
+                    ],
+                    "wifeId": 3,
+                    "householder": false
+                }
+            ],
+            "asSon": [
+                {
+                    "fatherId": 12
+                }
+            ]
+        },
+        "3": {
+            "id": 3,
+            "surname": "林",
+            "name": "母",
+            "sexy": 2,
+            "tier": -1,
+            "asMother": [
+                {
+                    "childIds": [
+                        1
+                    ],
+                    "husbandId": 2,
+                    "householder": false
+                }
+            ]
+        },
+        "4": {
+            "id": 4,
+            "surname": "林",
+            "name": "女",
+            "sexy": 2,
+            "tier": 1,
+            "asDaughter": [
+                {
+                    "fatherId": 1,
+                    "motherId": 5
+                }
+            ]
+        },
+        "5": {
+            "id": 5,
+            "surname": "林",
+            "name": "妻",
+            "sexy": 2,
+            "tier": 0,
+            "asMother": [
+                {
+                    "childIds": [
+                        4
+                    ],
+                    "husbandId": 1,
+                    "householder": false
+                }
+            ]
+        },
+        "6": {
+            "id": 6,
+            "surname": "林",
+            "name": "叔1",
+            "sexy": 1,
+            "tier": -1,
+            "asFather": [
+                {
+                    "wifeId": 10,
+                    "householder": false
+                }
+            ],
+            "asSon": [
+                {
+                    "fatherId": 12
+                }
+            ]
+        },
+        "7": {
+            "id": 7,
+            "surname": "林",
+            "name": "叔2",
+            "sexy": 1,
+            "tier": -1,
+            "asSon": [
+                {
+                    "fatherId": 12
+                }
+            ]
+        },
+        "8": {
+            "id": 8,
+            "surname": "林",
+            "name": "姨1",
+            "sexy": 1,
+            "tier": -1,
+            "asSon": [
+                {
+                    "fatherId": 12
+                }
+            ]
+        },
+        "9": {
+            "id": 9,
+            "surname": "林",
+            "name": "姨2",
+            "sexy": 1,
+            "tier": -1,
+            "asMother": [
+                {
+                    "husbandId": 11,
+                    "householder": false
+                }
+            ],
+            "asSon": [
+                {
+                    "fatherId": 12
+                }
+            ]
+        },
+        "10": {
+            "id": 10,
+            "surname": "林",
+            "name": "婶1",
+            "sexy": 1,
+            "tier": -1,
+            "asMother": [
+                {
+                    "husbandId": 6,
+                    "householder": false
+                }
+            ]
+        },
+        "11": {
+            "id": 11,
+            "surname": "林",
+            "name": "姨父2",
+            "sexy": 1,
+            "tier": -1,
+            "asFather": [
+                {
+                    "wifeId": 9,
+                    "householder": false
+                }
+            ]
+        },
+        "12": {
+            "id": 12,
+            "surname": "林",
+            "name": "爷",
+            "sexy": 1,
+            "tier": -2,
+            "asFather": [
+                {
+                    "childIds": [
+                        2
+                    ],
+                    "householder": false
+                },
+                {
+                    "childIds": [
+                        6
+                    ],
+                    "householder": false
+                },
+                {
+                    "childIds": [
+                        7
+                    ],
+                    "householder": false
+                },
+                {
+                    "childIds": [
+                        8
+                    ],
+                    "householder": false
+                },
+                {
+                    "childIds": [
+                        9
+                    ],
+                    "householder": false
+                }
+            ]
+        }
+    }
+}

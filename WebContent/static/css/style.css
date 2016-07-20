@@ -1,0 +1,31 @@
+body {
+    font-size: 10px; /*屏幕大于700px时，字体body font-size设置为14px*/
+	background-color: #fafafa;
+	font-family: "Microsoft YaHei" ;	
+}
+body>div {
+	max-width: 780px;
+	min-width: 400px;
+	margin: 0 auto;
+}
+header {
+	background-color: #d3ab6d;
+	color: white;
+	padding: 0.5em 0;
+}
+.back {
+	font-size: 1.5em;
+	color: white;
+	padding-left: 4px;
+}
+.title {
+	font-size: 1.8em;
+	position: absolute;
+	right: 50px;
+	left: 50px;
+	top: 4px;
+	text-align: center;
+	margin: 0px;
+	display: inline-block;
+}
+

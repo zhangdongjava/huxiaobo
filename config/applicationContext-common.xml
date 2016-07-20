@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:cache="http://www.springframework.org/schema/cache"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:aop="http://www.springframework.org/schema/aop" 
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.2.xsd
+        http://www.springframework.org/schema/cache 
+        http://www.springframework.org/schema/cache/spring-cache-3.2.xsd
+        http://www.springframework.org/schema/mvc 
+        http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+        http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop-3.2.xsd">
+
+	<!--propeties文件的配置-->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			 <list>
+                <value>classpath:bbs.properties</value>
+            </list>
+		</property>
+	</bean>
+	<!--sessionFactory的定义-->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<!--注入数据源-->
+		<property name="dataSource" ref="dataSource"/>
+		<property name="packagesToScan" value="com.findu.model" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${database.dialect}</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.current_session_context_class">thread</prop>
+				<prop key="hibernate.cache.use_query_cache">true</prop>
+                <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
+                <prop key="hibernate.net.sf.ehcache.configurationResourceName">ehcache.xml</prop>
+			</props>
+		</property>
+	</bean>
+	<!--数据源的配置，使用c3p0-->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="${database.driverClass}"/>
+		<property name="jdbcUrl" value="${database.jdbcUrl}"/>
+		<property name="user" value="${database.user}"/>
+		<property name="password" value="${database.password}"/>
+		<property name="maxPoolSize" value="80"/>
+		<property name="minPoolSize" value="10"/>
+		<property name="maxStatements" value="60" />
+		<property name="initialPoolSize" value="1"/>
+		<property name="maxIdleTime" value="20"/>
+		<!-- 定期使用连接池内的连接，使得它们不会因为闲置超时而被 MySQL 断开-->
+		<property name="preferredTestQuery" value="SELECT 1"/>    
+		<property name="idleConnectionTestPeriod" value="18000"/>
+		<property name="testConnectionOnCheckout" value="true"/>
+	</bean>
+	<!--事务管理的配置-->
+	<bean id="transactionManager"
+        class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean> 
+     <bean id="transactionInterceptor" 
+        class="org.springframework.transaction.interceptor.TransactionInterceptor"> 
+        <property name="transactionManager" ref="transactionManager" /> 
+        <!-- 配置事务属性 --> 
+        <property name="transactionAttributes"> 
+            <props> 
+                <prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="insert*">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>			
+				<prop key="batch*">PROPAGATION_REQUIRED</prop>
+				<prop key="execute*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="query*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="search*">PROPAGATION_REQUIRED,readOnly</prop> 
+            </props> 
+        </property> 
+    </bean>
+	<bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+        <property name="beanNames"> 
+            <list> 
+            	<!--所有名字以ServiceImpl结尾的bean自动配置事务-->
+            	<!--因为我们是以注解的方式实现的，默认bean的名字就是类的名称-->
+            	<!--平时我们以xml方式配置时，一般给以Service结尾-->
+                <value>*ServiceImpl</value>
+            </list> 
+        </property> 
+        <property name="interceptorNames"> 
+            <list> 
+                <value>transactionInterceptor</value> 
+            </list> 
+        </property> 
+    </bean>
+	<mvc:interceptors >
+		<mvc:interceptor>
+			<mvc:mapping path="/findu/v2_1/**"/>
+			<bean class="com.findu.controller.AuthInterceptor"/>
+		</mvc:interceptor>  		
+  	</mvc:interceptors> 
+   
+	<!-- cacheManager工厂类，指定ehcache.xml的位置 
+	<bean id="ehcacheManagerFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation" value="/WEB-INF/ehcache.xml" />
+		<property name="shared" value="true"/>
+	</bean>
+	-->
+	<!-- 声明cacheManager 
+	<bean id="ehcacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+		<property name="cacheManager" ref="ehcacheManagerFactory" />
+	</bean>
+	-->
+</beans>
